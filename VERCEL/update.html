@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Menu - Luciole Admin</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans min-h-screen flex flex-col items-center justify-center p-6">
+
+<div class="bg-white rounded-2xl shadow-md border border-gray-200 w-full max-w-md overflow-hidden">
+
+    <div class="bg-[#FBE49D] px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+        <h2 class="text-md font-black text-gray-800 uppercase tracking-wider">
+            ✏️ Edit Varian Menu
+        </h2>
+
+        <a href="dashboard.html"
+           class="text-xs bg-white hover:bg-gray-50 text-gray-700 font-bold px-3 py-1.5 rounded-lg border transition shadow-sm">
+            &larr; Batal
+        </a>
+    </div>
+
+    <form onsubmit="handleUpdateMenu(event)" class="p-6 space-y-5">
+
+        <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-gray-600 uppercase tracking-wide">
+                Nama Varian Menu
+            </label>
+            <input type="text"
+                   id="editMenuName"
+                   class="w-full px-3 py-2 text-sm rounded-lg border bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-yellow-300 transition"
+                   required>
+        </div>
+
+        <div class="flex flex-col gap-2">
+            <img id="menuImagePreview" src="" class="w-40 h-40 object-cover rounded-lg border hidden">
+
+            <input type="file"
+                   id="editMenuFile"
+                   accept="image/*"
+                   onchange="previewImage(event)">
+
+            <label class="text-sm text-gray-700 cursor-pointer">
+                <input type="checkbox" id="deleteImageCheck">
+                Hapus gambar
+            </label>
+        </div>
+
+        <div class="grid grid-cols-3 gap-4">
+
+            <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-bold text-gray-600 uppercase tracking-wide">
+                    Sisa Stok (pcs)
+                </label>
+                <input type="number"
+                       id="editMenuQty"
+                       oninput="autoUpdateStatus()"
+                       class="w-full px-3 py-2 text-sm rounded-lg border bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-yellow-300 transition"
+                       required>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-bold text-gray-600 uppercase tracking-wide">
+                    Harga (Rp)
+                </label>
+                <input type="number"
+                       id="editMenuPrice"
+                       class="w-full px-3 py-2 text-sm rounded-lg border bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-yellow-300 transition"
+                       required>
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <label class="text-xs font-bold text-gray-600 uppercase tracking-wide">
+                    Kategori
+                </label>
+                <select id="editMenuCategory"
+                        class="w-full px-3 py-2 text-sm rounded-lg border bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-yellow-300 transition"
+                        required>
+                    <option value="Ice Cream">Ice Cream</option>
+                    <option value="Drinks">Drinks</option>
+                    <option value="Snacks">Snacks</option>
+                </select>
+            </div>
+
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold text-gray-600 uppercase tracking-wide">
+                Status Etalase Produk
+            </label>
+            <select id="editMenuStatus"
+                    class="w-full px-3 py-2 text-sm rounded-lg border bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-yellow-300 transition"
+                    required>
+                <option value="Available">🟢 Available (Tersedia)</option>
+                <option value="Unavailable">🔴 Sold Out (Habis)</option>
+            </select>
+        </div>
+
+        <div class="pt-2">
+            <button type="submit"
+                    class="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold text-sm py-2.5 rounded-lg transition shadow-sm tracking-wide">
+                💾 Simpan Perubahan Menu
+            </button>
+        </div>
+
+    </form>
+</div>
+
+<script>
+    // PROTEKSI HALAMAN: Harus login admin
+    if (sessionStorage.getItem('admin_logged_in') !== 'true') {
+        alert('Akses ditolak! Silakan login terlebih dahulu.');
+        window.location.href = 'login.html';
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const menuId = urlParams.get('id');
+
+    let menus = JSON.parse(localStorage.getItem('menus')) || [];
+    let currentMenu = menus.find(m => m.menu_id == menuId);
+
+    const defaultPlaceholder = "https://images.unsplash.com/photo-1546171753-97d7676e4602?w=500";
+    let currentImageBase64 = "";
+
+    if (currentMenu) {
+        document.getElementById('editMenuName').value = currentMenu.menu_name;
+        document.getElementById('editMenuQty').value = currentMenu.qty;
+        document.getElementById('editMenuPrice').value = currentMenu.price;
+        document.getElementById('editMenuCategory').value = currentMenu.category;
+        
+        document.getElementById('editMenuStatus').value = currentMenu.status === 'Sold Out' ? 'Unavailable' : currentMenu.status;
+        
+        if (currentMenu.image) {
+            currentImageBase64 = currentMenu.image;
+            const imgEl = document.getElementById('menuImagePreview');
+            imgEl.src = currentImageBase64;
+            imgEl.classList.remove('hidden');
+        }
+    } else {
+        window.location.href = 'dashboard.html';
+    }
+
+    function previewImage(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentImageBase64 = e.target.result;
+                const imgEl = document.getElementById('menuImagePreview');
+                imgEl.src = currentImageBase64;
+                imgEl.classList.remove('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function autoUpdateStatus() {
+        const qty = parseInt(document.getElementById('editMenuQty').value) || 0;
+        const statusSelect = document.getElementById('editMenuStatus');
+        if (qty <= 0) {
+            statusSelect.value = "Unavailable";
+        } else {
+            statusSelect.value = "Available";
+        }
+    }
+
+    function handleUpdateMenu(event) {
+        event.preventDefault();
+
+        let menuIndex = menus.findIndex(m => m.menu_id == menuId);
+        if (menuIndex !== -1) {
+            const isDeleteImage = document.getElementById('deleteImageCheck').checked;
+
+            menus[menuIndex].menu_name = document.getElementById('editMenuName').value;
+            menus[menuIndex].qty = parseInt(document.getElementById('editMenuQty').value);
+            menus[menuIndex].price = parseInt(document.getElementById('editMenuPrice').value);
+            menus[menuIndex].category = document.getElementById('editMenuCategory').value;
+            
+            const statusVal = document.getElementById('editMenuStatus').value;
+            menus[menuIndex].status = statusVal === 'Unavailable' ? 'Sold Out' : 'Available';
+            
+            menus[menuIndex].image = isDeleteImage ? defaultPlaceholder : currentImageBase64;
+
+            localStorage.setItem('menus', JSON.stringify(menus));
+            alert('Perubahan data menu berhasil disimpan!');
+            window.location.href = 'dashboard.html';
+        }
+    }
+</script>
+
+</body>
+</html>

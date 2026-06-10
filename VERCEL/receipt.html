@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Struk Elektronik</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-yellow-50 min-h-screen flex items-center justify-center">
+
+    <div class="bg-white w-[380px] p-6 rounded-3xl shadow-xl">
+        <h1 class="text-2xl font-black text-center mb-2">LUCIOLE</h1>
+        <p class="text-center text-sm text-gray-400 mb-6">Electronic Receipt</p>
+
+        <div class="border-t border-b py-4 space-y-2 text-sm">
+           <p><b>Order ID:</b> <span id="r_id">#TRX-0</span></p>
+           <p><b>Status:</b> <span id="r_status">Unknown</span></p>
+           <p><b>Date:</b> <span id="r_date">00/00/2026</span></p>
+        </div>
+
+        <div id="receiptItems" class="py-4 space-y-2">
+            </div>
+
+        <div class="border-t pt-4 flex justify-between font-black text-lg">
+            <span>Total</span>
+            <span id="r_total">Rp 0</span>
+        </div>
+
+        <div class="mt-6 flex gap-2">
+            <a href="index.html" class="w-full text-center bg-yellow-300 py-3 rounded-2xl font-bold hover:bg-yellow-400 transition">
+                Back
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const txId = urlParams.get('id');
+
+        const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+        const currentTx = transactions.find(t => t.transaction_id == txId);
+
+        if (currentTx) {
+            document.getElementById('r_id').innerText = '#TRX-' + currentTx.transaction_id;
+            document.getElementById('r_status').innerText = currentTx.order_status;
+            
+            document.getElementById('r_date').innerText = currentTx.date || new Date().toLocaleDateString('id-ID');
+
+            const container = document.getElementById('receiptItems');
+            let total = 0;
+            container.innerHTML = ''; 
+
+            currentTx.details.forEach(item => {
+                let subtotal = item.qty * item.price;
+                total += subtotal;
+
+                container.innerHTML += `
+                    <div class="flex justify-between text-sm">
+                        <span>${item.menu_name} x ${item.qty}</span>
+                        <span>Rp ${subtotal.toLocaleString('id-ID')}</span>
+                    </div>
+                `;
+            });
+
+            document.getElementById('r_total').innerText = 'Rp ' + total.toLocaleString('id-ID');
+        } else {
+            alert('Stok / Struk tidak ditemukan.');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

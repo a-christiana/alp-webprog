@@ -85,7 +85,7 @@ switch ($action) {
 
     header("Location: dashboard.php");
     break;
-    
+
     // 3. HAPUS MENU
     case 'delete_menu':
         $id = intval($_GET['id']);
@@ -93,7 +93,7 @@ switch ($action) {
         header("Location: dashboard.php");
         break;
 
-    // 4. MEMBUAT TRANSAKSI BARU (DARI STOREFRONT)
+    // 4. MEMBUAT TRANSAKSI BARU
     case 'add_to_cart':
     session_start();
 
@@ -130,27 +130,20 @@ case 'checkout':
 
     mysqli_query($conn, "INSERT INTO `transaction` (order_status) VALUES ('Incoming')");
     $transaction_id = mysqli_insert_id($conn);
-
     $_SESSION['last_transaction_id'] = $transaction_id;
 
     foreach ($_SESSION['cart'] as $menu_id => $qty) {
         $menu_id = intval($menu_id);
         $qty = intval($qty);
-
         $check_menu = mysqli_query($conn, "SELECT qty FROM menu WHERE menu_id = $menu_id");
         $menu = mysqli_fetch_assoc($check_menu);
-
         
         if ($menu && $menu['qty'] >= $qty) {
             mysqli_query($conn, "UPDATE menu SET qty = qty - $qty WHERE menu_id = $menu_id");
-
             $get_price = mysqli_query($conn,
             "SELECT price FROM menu WHERE menu_id = $menu_id");
-
             $data_price = mysqli_fetch_assoc($get_price);
-
             $price = $data_price['price'];
-
             mysqli_query($conn, "INSERT INTO transaction_detail 
             (transaction_id, menu_id, price, qty) 
             VALUES ($transaction_id, $menu_id, $price, $qty)");

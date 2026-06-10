@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUCIOLE - Online Ice Cream & Snacks</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 font-sans min-h-screen">
+
+    <nav class="bg-white sticky top-0 shadow-sm px-8 py-6 flex items-center justify-between z-50 border-b border-gray-100">
+        <div class="text-2xl font-bold tracking-widest text-gray-800">LUCIOLE</div>
+        <div class="flex items-center space-x-6">
+            <a href="dashboard.html" class="text-sm font-semibold text-gray-600 hover:text-black transition">
+                Admin Panel &rarr;
+            </a>
+        </div>
+    </nav>
+
+    <section class="p-8 max-w-7xl mx-auto">
+        <div class="flex gap-x-4 mb-10 overflow-x-auto pb-2 scrollbar-none">
+            <button onclick="filterCategory('ALL')" class="category-btn px-10 py-2.5 rounded-full bg-[#FBE49D] text-black font-semibold shadow-sm text-sm transition-all duration-200">ALL</button>
+            <button onclick="filterCategory('Ice Cream')" class="category-btn px-10 py-2.5 rounded-full bg-white border text-gray-600 font-semibold text-sm hover:bg-gray-50 transition-all duration-200">Ice Cream</button>
+            <button onclick="filterCategory('Drinks')" class="category-btn px-10 py-2.5 rounded-full bg-white border text-gray-600 font-semibold text-sm hover:bg-gray-50 transition-all duration-200">Drinks</button>
+            <button onclick="filterCategory('Snacks')" class="category-btn px-10 py-2.5 rounded-full bg-white border text-gray-600 font-semibold text-sm hover:bg-gray-50 transition-all duration-200">Snacks</button>
+        </div>
+
+        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            </div>
+    </section>
+
+    <div id="orderModal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl transform scale-95 transition-transform duration-300 mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <span class="text-xs font-bold text-orange-500 uppercase tracking-wider">Customize Order</span>
+                    <h2 id="modalMenuName" class="text-xl font-black text-gray-800">Nama Menu</h2>
+                </div>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-black text-xl font-bold bg-gray-100 p-2 rounded-full w-9 h-9 flex items-center justify-center transition">&times;</button>
+            </div>
+
+            <form onsubmit="handleAddToCart(event)" class="space-y-4">
+                <input type="hidden" id="modalMenuId">
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Nama Penerima</label>
+                    <input type="text" id="customerName" required placeholder="Masukkan nama kamu" 
+                           class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-300 font-medium text-sm transition">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Jenis Pesanan</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="cursor-pointer border rounded-2xl p-3 flex items-center justify-center gap-2 font-semibold text-sm bg-gray-50 border-gray-100 hover:bg-gray-100 transition [&:has(input:checked)]:bg-amber-50 [&$:has(input:checked)]:border-amber-400">
+                            <input type="radio" name="order_type" value="Dine In" checked class="accent-amber-500">
+                            🍽️ Dine In
+                        </label>
+                        <label class="cursor-pointer border rounded-2xl p-3 flex items-center justify-center gap-2 font-semibold text-sm bg-gray-50 border-gray-100 hover:bg-gray-100 transition [&:has(input:checked)]:bg-amber-50 [&:has(input:checked)]:border-amber-400">
+                            <input type="radio" name="order_type" value="Take Away" class="accent-amber-500">
+                            🛍️ Take Away
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Jumlah Pesanan</label>
+                    <p class="text-[11px] text-gray-400 mb-2">Sisa stok tersedia: <span id="modalStockLabel" class="font-bold">0</span> pcs</p>
+                    <div class="flex items-center gap-4 bg-gray-50 border border-gray-100 p-2 rounded-2xl w-max">
+                        <button type="button" onclick="decrementQty()" class="w-8 h-8 rounded-xl bg-white shadow-sm flex items-center justify-center font-bold text-gray-600 hover:bg-gray-100 transition active:scale-90">-</button>
+                        <input type="number" id="modalQtyInput" value="1" min="1" readonly class="w-12 text-center bg-transparent font-extrabold text-gray-800 focus:outline-none">
+                        <button type="button" onclick="incrementQty()" class="w-8 h-8 rounded-xl bg-white shadow-sm flex items-center justify-center font-bold text-gray-600 hover:bg-gray-100 transition active:scale-90">+</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">Catatan (Optional)</label>
+                    <textarea id="modalNotes" rows="2" placeholder="Contoh: Sendoknya double ya, jangan terlalu manis..." 
+                              class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-2xl focus:outline-none focus:ring-2 focus:ring-yellow-300 font-medium text-sm resize-none transition"></textarea>
+                </div>
+
+                <div class="border-t border-gray-100 pt-4 mt-6 flex items-center justify-between">
+                    <div>
+                        <span class="block text-[10px] text-gray-400 font-bold uppercase tracking-wider">Total Pembayaran</span>
+                        <span class="text-xl font-black text-gray-900">Rp <span id="modalTotalPrice">0</span></span>
+                    </div>
+                    <button type="submit" class="px-8 py-3 bg-[#FBE49D] hover:bg-yellow-400 text-black font-black text-sm rounded-2xl transition transform active:scale-95 shadow-md shadow-yellow-100">
+                        KONFIRMASI ORDER
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <a href="confirm_checkout.html" class="fixed bottom-6 right-6 bg-yellow-400 hover:bg-yellow-500 px-6 py-4 rounded-full font-black shadow-xl z-50 flex items-center gap-2">
+        🛒 Cart / Checkout <span id="cartBadge" class="bg-black text-white text-xs px-2 py-0.5 rounded-full hidden">0</span>
+    </a>
+
+    <script>
+    // 1. DUMMY DATA 
+    const initialMenus = [
+        { menu_id: "1", menu_name: "Blue Pacific", price: 18000, qty: 10, category: "Ice Cream", status: "Available", image: "https://images.unsplash.com/photo-1546171753-97d7676e4602?w=500" },
+        { menu_id: "2", menu_name: "Crispy Almond Waffle", price: 12000, qty: 15, category: "Snacks", status: "Available", image: "https://images.unsplash.com/photo-1562376502-6f769499c886?w=500" },
+        { menu_id: "3", menu_name: "Hojicha", price: 35000, qty: 20, category: "Drinks", status: "Available", image: "https://images.unsplash.com/photo-1534778101976-62847782c213?w=500" },
+        { menu_id: "4", menu_name: "Hojicha Large", price: 20000, qty: 12, category: "Drinks", status: "Available", image: "https://images.unsplash.com/photo-1534778101976-62847782c213?w=500" },
+        { menu_id: "5", menu_name: "Matcha Latte", price: 25000, qty: 18, category: "Drinks", status: "Available", image: "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=500" },
+        { menu_id: "6", menu_name: "Vanilla Ice Cream", price: 8000, qty: 30, category: "Ice Cream", status: "Available", image: "https://images.unsplash.com/photo-1501443762994-82bd5dace89a?w=500" },
+        { menu_id: "7", menu_name: "Chocolate Ice Cream", price: 7000, qty: 0, category: "Ice Cream", status: "Unavailable", image: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=500" }
+    ];
+
+    if (!localStorage.getItem('menus')) {
+        localStorage.setItem('menus', JSON.stringify(initialMenus));
+    }
+
+    let currentPrice = 0;
+    let maxStock = 0;
+
+    // 2. MENU
+    function renderMenus() {
+        const menus = JSON.parse(localStorage.getItem('menus'));
+        const grid = document.getElementById('productGrid');
+        grid.innerHTML = '';
+
+        menus.forEach(item => {
+            const isAvailable = item.status === 'Available' && item.qty > 0;
+            const card = document.createElement('div');
+            card.className = `menu-item bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-between border border-gray-100 p-5 ${!isAvailable ? 'opacity-50 bg-gray-50' : ''}`;
+            card.setAttribute('data-category', item.category);
+
+            card.innerHTML = `
+                <div class="w-full h-44 rounded-2xl overflow-hidden mb-4">
+                    <img src="${item.image}" alt="${item.menu_name}" class="w-full h-full object-cover ${!isAvailable ? 'grayscale' : ''}">
+                </div>
+                <div class="mb-4">
+                    <h3 class="text-lg font-bold ${!isAvailable ? 'text-gray-400' : 'text-gray-800'} mb-1">${item.menu_name}</h3>
+                    <div class="flex gap-2 items-center">
+                        <span class="text-[10px] uppercase tracking-wider bg-orange-50 text-orange-600 font-bold px-2 py-1 rounded-md">${item.category}</span>
+                        ${!isAvailable ? '<span class="text-[10px] uppercase tracking-wider bg-red-100 text-red-600 font-bold px-2 py-1 rounded-md">🚫 UNAVAILABLE</span>' : ''}
+                    </div>
+                </div>
+                <div class="flex items-center justify-between mt-auto pt-2 border-t border-gray-50">
+                    <span class="text-lg font-extrabold ${!isAvailable ? 'text-gray-400' : 'text-gray-900'}">Rp ${item.price.toLocaleString('id-ID')}</span>
+                    ${isAvailable ? 
+                        `<button type="button" onclick="openModal('${item.menu_id}', '${item.menu_name.replace(/'/g, "\\'")}', ${item.price}, ${item.qty})" class="px-5 py-2 bg-[#FBE49D] hover:bg-yellow-400 text-black font-bold text-xs rounded-full transition transform active:scale-95">ORDER NOW</button>` : 
+                        `<button type="button" class="px-5 py-2 bg-gray-300 text-gray-500 font-bold text-xs rounded-full cursor-not-allowed" disabled>OUT OF STOCK</button>`
+                    }
+                </div>
+            `;
+            grid.appendChild(card);
+        });
+        updateCartBadge();
+    }
+
+    function openModal(id, name, price, stock) {
+        currentPrice = price;
+        maxStock = stock;
+
+        document.getElementById('modalMenuId').value = id;
+        document.getElementById('modalMenuName').innerText = name;
+        document.getElementById('modalStockLabel').innerText = stock;
+        document.getElementById('modalQtyInput').value = 1;
+        
+        updateTotalPrice();
+
+        const modal = document.getElementById('orderModal');
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modal.classList.remove('opacity-0');
+            modal.querySelector('div').classList.remove('scale-95');
+        }, 10);
+    }
+
+    function closeModal() {
+        const modal = document.getElementById('orderModal');
+        modal.classList.add('opacity-0');
+        modal.querySelector('div').classList.add('scale-95');
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 300);
+    }
+
+    function incrementQty() {
+        const input = document.getElementById('modalQtyInput');
+        let val = parseInt(input.value);
+        if (val < maxStock) {
+            input.value = val + 1;
+            updateTotalPrice();
+        }
+    }
+
+    function decrementQty() {
+        const input = document.getElementById('modalQtyInput');
+        let val = parseInt(input.value);
+        if (val > 1) {
+            input.value = val - 1;
+            updateTotalPrice();
+        }
+    }
+
+    function updateTotalPrice() {
+        const qty = parseInt(document.getElementById('modalQtyInput').value);
+        const total = qty * currentPrice;
+        document.getElementById('modalTotalPrice').innerText = total.toLocaleString('id-ID');
+    }
+
+    // ADD TO CART
+    function handleAddToCart(event) {
+        event.preventDefault();
+        const menuId = document.getElementById('modalMenuId').value;
+        const qty = parseInt(document.getElementById('modalQtyInput').value);
+
+        let cart = JSON.parse(localStorage.getItem('cart')) || {};
+        cart[menuId] = (cart[menuId] || 0) + qty;
+
+        localStorage.setItem('cart', JSON.stringify(cart));
+        alert('Menu berhasil ditambahkan ke cart!');
+        closeModal();
+        updateCartBadge();
+    }
+
+    function updateCartBadge() {
+    const badge = document.getElementById('cartBadge');
+    if (badge) {
+        badge.classList.add('hidden');
+    }
+}
+
+    // KATEGORI DIFILTER
+    function filterCategory(selectedCategory) {
+        const items = document.querySelectorAll('.menu-item');
+        items.forEach(item => {
+            const itemCategory = item.getAttribute('data-category');
+            if (selectedCategory === 'ALL' || itemCategory === selectedCategory) {
+                item.style.display = 'flex'; 
+            } else {
+                item.style.display = 'none'; 
+            }
+        });
+
+        const buttons = document.querySelectorAll('.category-btn');
+        buttons.forEach(btn => {
+            btn.classList.remove('bg-[#FBE49D]', 'text-black', 'shadow-sm');
+            btn.classList.add('bg-white', 'border', 'text-gray-600');
+        });
+
+        event.currentTarget.classList.remove('bg-white', 'border', 'text-gray-600');
+        event.currentTarget.classList.add('bg-[#FBE49D]', 'text-black', 'shadow-sm');
+    }
+
+    window.onload = renderMenus;
+    </script>
+</body>
+</html>
+

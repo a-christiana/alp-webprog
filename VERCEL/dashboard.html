@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Luciole</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans min-h-screen flex flex-col">
+
+    <header class="bg-[#FBE49D] px-8 py-4 flex items-center justify-between shadow-sm">
+        <div class="flex items-center space-x-12">
+            <h1 class="text-xl font-bold tracking-widest text-gray-800">LUCIOLE ADMIN</h1>
+            <nav class="space-x-6 text-sm font-medium text-gray-700">
+                <a href="index.html" class="hover:text-black">Storefront</a>
+                <a href="#" class="hover:text-black border-b-2 border-black pb-1">Dashboard</a>
+            </nav>
+        </div>
+    
+        <button onclick="handleLogout()" 
+           style="background-color: #dc3545; color: white; padding: 6px 12px; border: none; border-radius: 4px; font-family: sans-serif; font-size: 14px; font-weight: bold; cursor: pointer;">
+            Logout
+        </button>
+    </header>
+
+    <main class="flex-1 p-8 space-y-8">
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-blue-50 p-5 rounded-xl border border-blue-200 shadow-sm flex flex-col justify-between">
+                <p class="text-xs font-bold uppercase tracking-wider text-blue-600">📥 Pesanan Masuk</p>
+                <p class="text-3xl font-black text-blue-900 mt-2"><span id="countIncoming">0</span> <span class="text-sm font-normal">Antrean</span></p>
+            </div>
+            <div class="bg-amber-50 p-5 rounded-xl border border-amber-200 shadow-sm flex flex-col justify-between">
+                <p class="text-xs font-bold uppercase tracking-wider text-amber-600">⏳ In Progress</p>
+                <p class="text-3xl font-black text-amber-900 mt-2"><span id="countProgress">0</span> <span class="text-sm font-normal">Dibuat</span></p>
+            </div>
+            <div class="bg-purple-50 p-5 rounded-xl border border-purple-200 shadow-sm flex flex-col justify-between">
+                <p class="text-xs font-bold uppercase tracking-wider text-purple-600">🛍️ Ready to Pick Up</p>
+                <p class="text-3xl font-black text-purple-900 mt-2"><span id="countPickup">0</span> <span class="text-sm font-normal">Siap</span></p>
+            </div>
+            <div class="bg-green-50 p-5 rounded-xl border border-green-200 shadow-sm flex flex-col justify-between">
+                <p class="text-xs font-bold uppercase tracking-wider text-green-600">✅ Completed</p>
+                <p class="text-3xl font-black text-green-900 mt-2"><span id="countCompleted">0</span> <span class="text-sm font-normal">Selesai</span></p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow p-6 border border-gray-200">
+            <h2 class="text-lg font-extrabold text-gray-800 mb-4">📋 Antrean & Status Orderan Masuk</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 text-gray-600 text-xs font-bold uppercase border-b border-gray-200">
+                            <th class="p-3">ID Transaksi</th>
+                            <th class="p-3">Nama Menu</th>
+                            <th class="p-3">Jumlah</th>
+                            <th class="p-3">Status Pesanan</th>
+                            <th class="p-3 text-center">Aksi Proses Pesanan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody" class="text-sm">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow p-6 border border-gray-200">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                <h2 class="text-lg font-extrabold text-gray-800">🍦 Master Kelola Menu Toko</h2>
+                
+                <form onsubmit="handleAddMenu(event)" class="flex flex-wrap gap-2 items-center bg-gray-50 p-3 rounded-lg border w-full md:w-auto">
+                    <input type="text" id="newMenuName" placeholder="Nama Menu Baru" class="px-3 py-1.5 text-sm rounded border bg-white focus:outline-none" required>
+                    <input type="number" id="newMenuQty" placeholder="Stok" class="w-20 px-3 py-1.5 text-sm rounded border bg-white focus:outline-none" required>
+                    <input type="number" id="newMenuPrice" placeholder="Harga (Rp)" class="w-28 px-3 py-1.5 text-sm rounded border bg-white focus:outline-none" required>
+                    <input type="file" id="newMenuImage" accept="image/*" onchange="encodeImageFile(this)">
+                    <select id="newMenuCategory" class="px-3 py-1.5 text-sm rounded border bg-white focus:outline-none" required>
+                        <option value="Ice Cream">Ice Cream</option>
+                        <option value="Drinks">Drinks</option>
+                        <option value="Snacks">Snacks</option>
+                    </select>
+                    <button type="submit" class="bg-yellow-400 hover:bg-yellow-500 px-4 py-1.5 rounded text-sm font-semibold transition">+ Tambah Menu</button>
+                </form>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 text-gray-600 text-xs font-bold uppercase border-b border-gray-200">
+                            <th class="p-3">No.</th>
+                            <th class="p-3">Nama Menu</th>
+                            <th class="p-3">Kategori</th>
+                            <th class="p-3">Stok</th>
+                            <th class="p-3">Status Produk</th>
+                            <th class="p-3 text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="menuTableBody" class="text-sm">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 1. PROTEKSI LOGIN
+        if (sessionStorage.getItem('admin_logged_in') !== 'true') {
+            window.location.href = 'login.html';
+        }
+        let uploadedBase64Image = "";
+
+        // 2. DUMMY DATA
+        const defaultMenus = [
+            { menu_id: 1, menu_name: "Vanilla Ice Cream", category: "Ice Cream", qty: 16, price: 8000, status: "Available", image: "" },
+            { menu_id: 2, menu_name: "Chocolate Ice Cream", category: "Ice Cream", qty: 0, price: 7000, status: "Sold Out", image: "" },
+            { menu_id: 3, menu_name: "Hojicha", category: "Drinks", qty: 13, price: 35000, status: "Available", image: "" },
+            { menu_id: 4, menu_name: "Crispy Almond Waffle", category: "Snacks", qty: 32, price: 12000, status: "Available", image: "" },
+            { menu_id: 5, menu_name: "Matcha Latte", category: "Drinks", qty: 7, price: 25000, status: "Available", image: "" },
+            { menu_id: 6, menu_name: "Blue Pacific", category: "Ice Cream", qty: 10, price: 18000, status: "Available", image: "" },
+            { menu_id: 7, menu_name: "Hojicha Large", category: "Drinks", qty: 15, price: 20000, status: "Available", image: "" }
+        ];
+
+        if (!localStorage.getItem('menus')) {
+            localStorage.setItem('menus', JSON.stringify(defaultMenus));
+        }
+
+        // 3. UPDATE STATUS
+        function updateCounters() {
+            const txs = JSON.parse(localStorage.getItem('transactions')) || [];
+            document.getElementById('countIncoming').innerText = txs.filter(t => t.order_status === 'Incoming').length;
+            document.getElementById('countProgress').innerText = txs.filter(t => t.order_status === 'In Progress').length;
+            document.getElementById('countPickup').innerText = txs.filter(t => t.order_status === 'Ready to Pick Up').length;
+            document.getElementById('countCompleted').innerText = txs.filter(t => t.order_status === 'Completed').length;
+        }
+
+        // 4. TABEL TRANSAKSI/PESANAN
+        function renderOrdersTable() {
+            const txs = JSON.parse(localStorage.getItem('transactions')) || [];
+            const tbody = document.getElementById('ordersTableBody');
+            tbody.innerHTML = '';
+
+            if (txs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-gray-400 italic">Belum ada pesanan masuk dari storefront pembeli.</td></tr>`;
+                return;
+            }
+
+            txs.forEach(tx => {
+                tx.details.forEach(detail => {
+                    let statusBadge = '';
+                    if(tx.order_status === 'Incoming') statusBadge = '<span class="bg-blue-100 text-blue-800 px-2.5 py-1 rounded-full text-xs font-bold">Incoming</span>';
+                    else if(tx.order_status === 'In Progress') statusBadge = '<span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full text-xs font-bold">In Progress</span>';
+                    else if(tx.order_status === 'Ready to Pick Up') statusBadge = '<span class="bg-purple-100 text-purple-800 px-2.5 py-1 rounded-full text-xs font-bold">Ready to Pick Up</span>';
+                    else statusBadge = '<span class="bg-green-100 text-green-800 px-2.5 py-1 rounded-full text-xs font-bold">Completed</span>';
+
+                    let actionBtn = '';
+                    if(tx.order_status === 'Incoming') {
+                        actionBtn = `<button onclick="changeTxStatus(${tx.transaction_id}, 'In Progress')" class="bg-amber-400 hover:bg-amber-500 text-xs font-bold px-4 py-1.5 rounded transition shadow-sm">Proses Pembuatan &rarr;</button>`;
+                    } else if(tx.order_status === 'In Progress') {
+                        actionBtn = `<button onclick="changeTxStatus(${tx.transaction_id}, 'Ready to Pick Up')" class="bg-purple-500 hover:bg-purple-600 text-white text-xs font-bold px-4 py-1.5 rounded transition shadow-sm">Set Siap Diambil &rarr;</button>`;
+                    } else if(tx.order_status === 'Ready to Pick Up') {
+                        actionBtn = `<button onclick="changeTxStatus(${tx.transaction_id}, 'Completed')" class="bg-green-600 hover:bg-green-700 text-white text-xs font-bold px-4 py-1.5 rounded transition shadow-sm">Selesaikan Pesanan ✓</button>`;
+                    } else {
+                        actionBtn = `<span class="text-gray-400 text-xs font-medium italic">Pesanan Selesai Diarsip</span>`;
+                    }
+
+                    tbody.innerHTML += `
+                        <tr class="border-b hover:bg-gray-50">
+                            <td class="p-3 font-mono font-bold text-gray-600">#TRX-${tx.transaction_id}</td>
+                            <td class="p-3 font-semibold text-gray-800">${detail.menu_name}</td>
+                            <td class="p-3 text-gray-600">${detail.qty}x</td>
+                            <td class="p-3">${statusBadge}</td>
+                            <td class="p-3 text-center">${actionBtn}</td>
+                        </tr>
+                    `;
+                });
+            });
+        }
+
+        // 5. TABEL MENU
+        function renderMenuTable() {
+            const menus = JSON.parse(localStorage.getItem('menus')) || [];
+            const tbody = document.getElementById('menuTableBody');
+            tbody.innerHTML = '';
+
+            if (menus.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-400 italic">Belum ada data menu di gudang.</td></tr>`;
+                return;
+            }
+
+            menus.forEach((m, idx) => {
+                const badgeStyle = m.status === 'Available' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700';
+
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-gray-50">
+                        <td class="p-3 text-gray-500 font-semibold">${idx + 1}.</td>
+                        <td class="p-3 font-semibold text-gray-800">${m.menu_name}</td>
+                        <td class="p-3"><span class="bg-orange-50 text-orange-700 font-medium px-2 py-0.5 rounded text-xs">${m.category}</span></td>
+                        <td class="p-3 text-gray-700">${m.qty} pcs</td>
+                        <td class="p-3">
+                            <span class="px-2 py-0.5 rounded text-xs font-bold ${badgeStyle}">
+                                ${m.status}
+                            </span>
+                        </td>
+                        <td class="p-3 text-center space-x-4">
+                            <a href="update.html?id=${m.menu_id}" class="text-blue-500 hover:underline font-medium">Edit</a>
+                            <button onclick="deleteMenu(${m.menu_id})" class="text-red-500 hover:underline font-medium border-none bg-none p-0 cursor-pointer">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // 6. UBAH STATUS TRANSAKSI
+        function changeTxStatus(id, nextStatus) {
+            let txs = JSON.parse(localStorage.getItem('transactions')) || [];
+            let idx = txs.findIndex(t => t.transaction_id == id);
+            if(idx !== -1) {
+                txs[idx].order_status = nextStatus;
+                localStorage.setItem('transactions', JSON.stringify(txs));
+                updateCounters();
+                renderOrdersTable();
+            }
+        }
+
+        // 7. TAMBAH MENU BARU
+        function encodeImageFile(element) {
+            const file = element.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onloadend = function() {
+                    uploadedBase64Image = reader.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleAddMenu(event) {
+            event.preventDefault();
+            let menus = JSON.parse(localStorage.getItem('menus')) || [];
+            
+            const name = document.getElementById('newMenuName').value;
+            const qty = parseInt(document.getElementById('newMenuQty').value);
+            const price = parseInt(document.getElementById('newMenuPrice').value);
+            const category = document.getElementById('newMenuCategory').value;
+            const status = qty > 0 ? "Available" : "Sold Out";
+            const nextId = menus.length > 0 ? Math.max(...menus.map(m => m.menu_id)) + 1 : 1;
+
+            const newMenu = {
+                menu_id: nextId,
+                menu_name: name,
+                category: category,
+                qty: qty,
+                price: price,
+                status: status,
+                image: uploadedBase64Image || "https://images.unsplash.com/photo-1546171753-97d7676e4602?w=500"
+            };
+
+            menus.push(newMenu);
+            localStorage.setItem('menus', JSON.stringify(menus));
+            
+            event.target.reset();
+            uploadedBase64Image = "";
+
+            renderMenuTable();
+            alert("Menu baru berhasil ditambahkan!");
+        }
+
+        // 8. HAPUS MENU
+        function deleteMenu(id) {
+            if (confirm('Hapus menu ini?')) {
+                let menus = JSON.parse(localStorage.getItem('menus')) || [];
+                menus = menus.filter(m => m.menu_id != id);
+                localStorage.setItem('menus', JSON.stringify(menus));
+                renderMenuTable();
+            }
+        }
+
+        // 9. LOGOUT
+        function handleLogout() {
+            if (confirm('Confirm Logout?')) {
+                sessionStorage.removeItem('admin_logged_in');
+                window.location.href = 'login.html';
+            }
+        }
+
+        window.onload = function() {
+            updateCounters();
+            renderOrdersTable();
+            renderMenuTable();
+        };
+    </script>
+</body>
+</html>

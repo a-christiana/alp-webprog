@@ -2,7 +2,6 @@
 include 'koneksi.php'; 
 session_start();
 
-// Urutkan menu yang Available & Qty > 0 di atas, sisanya di bawah
 $query = "SELECT * FROM Menu ORDER BY CASE WHEN status = 'Available' AND qty > 0 THEN 1 ELSE 2 END ASC, menu_name ASC";
 $result = mysqli_query($conn, $query);
 ?>
@@ -45,7 +44,6 @@ $result = mysqli_query($conn, $query);
             <?php if(mysqli_num_rows($result) > 0): ?>
                 <?php while($row = mysqli_fetch_assoc($result)): 
                     $is_available = ($row['status'] == 'Available' && $row['qty'] > 0);
-                    // Kita asumsikan harga flat Rp 15000 dulu sesuai UI kamu, atau bisa diganti $row['price'] jika kolomnya sudah ada
                     $menu_price = $row['price']; 
                 ?>
                     
@@ -181,7 +179,7 @@ $result = mysqli_query($conn, $query);
     </div>
 
     <script>
-    // Global variables untuk menyimpan data item aktif yang sedang diklik
+
     let currentPrice = 0;
     let maxStock = 0;
 
@@ -189,16 +187,13 @@ $result = mysqli_query($conn, $query);
         currentPrice = price;
         maxStock = stock;
 
-        // Set nilai ke dalam elemen modal
         document.getElementById('modalMenuId').value = id;
         document.getElementById('modalMenuName').innerText = name;
         document.getElementById('modalStockLabel').innerText = stock;
         document.getElementById('modalQtyInput').value = 1;
         
-        // Hitung total harga awal (1 x harga item)
         updateTotalPrice();
 
-        // Tampilkan modal dengan efek transisi smooth
         const modal = document.getElementById('orderModal');
         modal.classList.remove('hidden');
         setTimeout(() => {
@@ -237,11 +232,9 @@ $result = mysqli_query($conn, $query);
     function updateTotalPrice() {
         const qty = parseInt(document.getElementById('modalQtyInput').value);
         const total = qty * currentPrice;
-        // Format angka ke format ribuan rupiah Indonesia
         document.getElementById('modalTotalPrice').innerText = total.toLocaleString('id-ID');
     }
 
-    // Fungsi filter kategori bawaan kamu yang sudah dibersihkan
     function filterCategory(selectedCategory) {
         const items = document.querySelectorAll('.menu-item');
         items.forEach(item => {
@@ -285,5 +278,9 @@ $result = mysqli_query($conn, $query);
     </div>
 </div>
 <?php } ?>
+<a href="confirm_checkout.php"
+   class="fixed bottom-6 right-6 bg-yellow-400 hover:bg-yellow-500 px-6 py-4 rounded-full font-black shadow-xl z-50">
+    🛒 Cart / Checkout
+</a>
 </body>
 </html>

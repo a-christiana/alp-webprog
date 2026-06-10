@@ -1,14 +1,11 @@
 <?php
 session_start();
 
-// JIKA BELUM LOGIN, LEMPAR PAKSA KE HALAMAN POP-UP LOGIN
 if (!isset($_SESSION['admin_logged_in'])) {
     header("Location: login.php");
     exit;
 }
 
-include 'koneksi.php';
-// ... sisanya kode dashboard.php kamu yang kemarin ...
 include 'koneksi.php';
 
 // 1. Ambil data Menu Gudang
@@ -46,7 +43,12 @@ $count_completed = mysqli_num_rows(mysqli_query($conn, "SELECT * FROM `Transacti
                 <a href="#" class="hover:text-black border-b-2 border-black pb-1">Dashboard</a>
             </nav>
         </div>
-        <div class="w-8 h-8 bg-gray-800 rounded-full flex items-center justify-center text-white text-xs font-bold">A</div>
+    
+        <a href="logout.php" 
+       style="background-color: #dc3545; color: white; padding: 6px 12px; text-decoration: none; border-radius: 4px; font-family: sans-serif; font-size: 14px; font-weight: bold;" 
+       onclick="return confirm('Confirm Logout?');">
+       Logout
+    </a>
     </header>
 
     <main class="flex-1 p-8 space-y-8">
@@ -156,7 +158,7 @@ $count_completed = mysqli_num_rows(mysqli_query($conn, "SELECT * FROM `Transacti
                         <?php if(mysqli_num_rows($menus) > 0): ?>
                             
                             <?php 
-                            $no = 1; // Solusi nomor urut rapi (1, 2, 3...) menggantikan id_menu yang melompat
+                            $no = 1;
                             ?>
                             
                             <?php while($m = mysqli_fetch_assoc($menus)): ?>

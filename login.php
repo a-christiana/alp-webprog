@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Jika sudah login admin, langsung lempar ke dashboard
 if (isset($_SESSION['admin_logged_in'])) {
     header("Location: dashboard.php");
     exit;
@@ -9,11 +8,9 @@ if (isset($_SESSION['admin_logged_in'])) {
 
 $error = "";
 
-// Validasi Password saat tombol diklik
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = $_POST['password'];
 
-    // Silakan ganti password-nya sesuai keinginanmu di sini (misal: admin123)
     if ($password === 'admin123') {
         $_SESSION['admin_logged_in'] = true;
         header("Location: dashboard.php");

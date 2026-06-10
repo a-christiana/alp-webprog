@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout Cart</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex justify-center items-center">
+
+<div class="bg-white p-6 rounded-3xl shadow-lg w-[500px]">
+
+    <h1 class="text-2xl font-black mb-4">
+        Checkout Cart
+    </h1>
+
+    <div id="cartItemsList">
+    </div>
+
+    <div class="flex justify-between font-black text-xl mt-4">
+        <span>Total</span>
+        <span id="cartGrandTotal">Rp 0</span>
+    </div>
+
+    <div class="mt-6 flex gap-3">
+        <a href="index.html"
+           class="flex-1 text-center bg-[#e5e7eb] py-3 rounded-xl font-bold hover:bg-gray-300 transition">
+            Kembali
+        </a>
+
+        <button onclick="processCheckout()"
+           class="flex-1 text-center bg-yellow-400 py-3 rounded-xl font-bold hover:bg-yellow-500 transition">
+            Confirm Checkout
+        </button>
+    </div>
+
+</div>
+
+<script>
+    function loadCart() {
+        const cart = JSON.parse(localStorage.getItem('cart')) || {};
+        const menus = JSON.parse(localStorage.getItem('menus')) || [];
+        const container = document.getElementById('cartItemsList');
+        
+        if (Object.keys(cart).length === 0) {
+            alert("Keranjang belanja kosong!");
+            window.location.href = "index.html";
+            return;
+        }
+
+        container.innerHTML = '';
+        let total = 0;
+
+        for (let id in cart) {
+            let menu = menus.find(m => m.menu_id == id);
+            if (menu) {
+                let qty = cart[id];
+                let subtotal = menu.price * qty;
+                total += subtotal;
+
+                container.innerHTML += `
+                    <div class="flex justify-between py-2 border-b">
+                        <span>
+                            ${menu.menu_name} x ${qty}
+                        </span>
+                        <span>
+                            Rp ${subtotal.toLocaleString('id-ID')}
+                        </span>
+                    </div>
+                `;
+            }
+        }
+        document.getElementById('cartGrandTotal').innerText = 'Rp ' + total.toLocaleString('id-ID');
+    }
+
+    function processCheckout() {
+        let cart = JSON.parse(localStorage.getItem('cart')) || {};
+        let menus = JSON.parse(localStorage.getItem('menus')) || [];
+
+        if (Object.keys(cart).length === 0) {
+            alert('Cart kosong!');
+            return;
+        }
+
+        let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+        let nextId = transactions.length + 1001; 
+
+        let details = [];
+        
+        for (let id in cart) {
+            let qty = cart[id];
+            let menuIndex = menus.findIndex(m => m.menu_id == id);
+
+            if (menuIndex !== -1) {
+                if (menus[menuIndex].qty >= qty) {
+                    menus[menuIndex].qty -= qty; 
+                    
+                    if(menus[menuIndex].qty <= 0) {
+                        menus[menuIndex].status = 'Unavailable';
+                    }
+                    
+                    details.push({
+                        menu_name: menus[menuIndex].menu_name,
+                        price: menus[menuIndex].price,
+                        qty: qty
+                    });
+                } else {
+                    alert(`Maaf, stok untuk ${menus[menuIndex].menu_name} tidak mencukupi.`);
+                    return;
+                }
+            }
+        }
+
+        let newTransaction = {
+            transaction_id: nextId,
+            order_status: 'Incoming', 
+            date: new Date().toLocaleDateString('id-ID'),
+            details: details
+        };
+
+        transactions.push(newTransaction);
+        localStorage.setItem('transactions', JSON.stringify(transactions));
+        localStorage.setItem('menus', JSON.stringify(menus));
+        
+        localStorage.removeItem('cart'); 
+
+        window.location.href = `receipt.html?id=${nextId}`;
+    }
+
+    window.onload = loadCart;
+</script>
+
+</body>
+</html>
