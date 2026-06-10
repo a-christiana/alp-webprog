@@ -64,7 +64,7 @@ $result = mysqli_query($conn, $query);
 </div>
                         
                         <div class="mb-4">
-                            <h3 class="text-lg font-bold <?= $is_available ? 'text-gray-800' : 'text-gray-400 line-through'; ?> mb-1">
+                            <h3 class="text-lg font-bold <?= $is_available ? 'text-gray-800' : 'text-gray-400'; ?> mb-1">
                                 <?= htmlspecialchars($row['menu_name']); ?>
                             </h3>
                             
