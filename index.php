@@ -261,7 +261,7 @@ $result = mysqli_query($conn, $query);
 </div>
 <?php } ?>
 
-<a href="controller.php?action=checkout"
+<a href="checkout_confirm.php"
    class="fixed bottom-6 right-6 bg-yellow-400 px-6 py-4 rounded-full font-black shadow-xl">
     Checkout Cart
 </a>
