@@ -35,7 +35,7 @@ if (!$menu) {
             </a>
         </div>
 
-        <form action="controller.php" method="POST" class="p-6 space-y-5">
+        <form action="controller.php" method="POST" enctype="multipart/form-data" class="p-6 space-y-5">
             <input type="hidden" name="action" value="update_menu">
             <input type="hidden" name="id" value="<?= $menu['menu_id']; ?>">
 
@@ -43,6 +43,12 @@ if (!$menu) {
                 <label class="text-xs font-bold text-gray-600 uppercase tracking-wide">Nama Varian Menu</label>
                 <input type="text" name="menu_name" value="<?= htmlspecialchars($menu['menu_name']); ?>" 
                        class="w-full px-3 py-2 text-sm rounded-lg border bg-gray-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-yellow-300 transition" required>
+                <?php if(!empty($menu['image'])): ?>
+                    <img src="uploads/<?= $menu['image']; ?>" width="150">
+                <?php endif; ?>
+                <input type="file" name="image" accept="image/*">
+                <label>
+                <input type="checkbox" name="delete_image">Hapus gambar</label>
             </div>
 
             <div class="grid grid-cols-2 gap-4">

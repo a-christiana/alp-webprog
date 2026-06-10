@@ -6,14 +6,33 @@ $action = isset($_GET['action']) ? $_GET['action'] : (isset($_POST['action']) ? 
 switch ($action) {
     // 1. TAMBAH MENU BARU
     case 'add_menu':
-        $name = mysqli_real_escape_string($conn, $_POST['menu_name']);
-        $qty  = intval($_POST['qty']);
-        $category = mysqli_real_escape_string($conn, $_POST['category']);
-        
-        $sql = "INSERT INTO Menu (menu_name, qty, category, status) VALUES ('$name', $qty, '$category', 'Available')";
-        mysqli_query($conn, $sql);
-        header("Location: dashboard.php");
-        break;
+
+    $name = mysqli_real_escape_string($conn, $_POST['menu_name']);
+    $qty = intval($_POST['qty']);
+    $category = mysqli_real_escape_string($conn, $_POST['category']);
+
+    $image_name = null;
+
+    if(isset($_FILES['image']) && $_FILES['image']['error'] == 0){
+
+        $image_name =
+            time() . "_" . basename($_FILES['image']['name']);
+
+        move_uploaded_file(
+            $_FILES['image']['tmp_name'],
+            "uploads/" . $image_name
+        );
+    }
+
+    $sql = "INSERT INTO Menu
+            (menu_name, qty, category, status, image)
+            VALUES
+            ('$name', $qty, '$category', 'Available', '$image_name')";
+
+    mysqli_query($conn, $sql);
+
+    header("Location: dashboard.php");
+    exit;
 
     // 2. EDIT/UPDATE MENU
     case 'update_menu':
