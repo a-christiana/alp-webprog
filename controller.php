@@ -5,18 +5,67 @@ $action = isset($_GET['action']) ? $_GET['action'] : (isset($_POST['action']) ? 
 
 switch ($action) {
     // 1. TAMBAH MENU BARU
-    case 'add_menu':
+   case 'add_menu':
 
     $name = mysqli_real_escape_string($conn, $_POST['menu_name']);
     $qty = intval($_POST['qty']);
+    $price = intval($_POST['price']);
     $category = mysqli_real_escape_string($conn, $_POST['category']);
 
-    $image_name = null;
+    $image_name = NULL;
 
     if(isset($_FILES['image']) && $_FILES['image']['error'] == 0){
 
-        $image_name =
-            time() . "_" . basename($_FILES['image']['name']);
+    $original_name = basename($_FILES['image']['name']);
+
+    $image_name = time() . "_" .
+        preg_replace('/[^A-Za-z0-9._-]/', '_', $original_name);
+
+    move_uploaded_file(
+        $_FILES['image']['tmp_name'],
+        "uploads/" . $image_name
+    );
+}
+
+    $sql = "INSERT INTO Menu
+            (menu_name, qty, price, category, status, image)
+            VALUES
+            ('$name', $qty, $price, '$category', 'Available', " .
+            ($image_name ? "'$image_name'" : "NULL") .
+            ")";
+
+    mysqli_query($conn, $sql) or die(mysqli_error($conn));
+
+    header("Location: dashboard.php");
+    exit;
+
+    // 2. EDIT/UPDATE MENU
+    case 'update_menu':
+
+    $id   = intval($_POST['id']);
+    $name = mysqli_real_escape_string($conn, $_POST['menu_name']);
+    $qty  = intval($_POST['qty']);
+    $category = mysqli_real_escape_string($conn, $_POST['category']);
+    $status = mysqli_real_escape_string($conn, $_POST['status']);
+
+    $old = mysqli_fetch_assoc(
+        mysqli_query($conn,
+        "SELECT image FROM Menu WHERE menu_id=$id")
+    );
+
+    $image_name = $old['image'];
+
+    if(isset($_FILES['image']) && $_FILES['image']['error'] == 0){
+
+        if(!empty($old['image']) &&
+           file_exists("uploads/".$old['image'])){
+            unlink("uploads/".$old['image']);
+        }
+
+        $original_name = basename($_FILES['image']['name']);
+
+        $image_name = time() . "_" .
+            preg_replace('/[^A-Za-z0-9._-]/', '_', $original_name);
 
         move_uploaded_file(
             $_FILES['image']['tmp_name'],
@@ -24,28 +73,18 @@ switch ($action) {
         );
     }
 
-    $sql = "INSERT INTO Menu
-            (menu_name, qty, category, status, image)
-            VALUES
-            ('$name', $qty, '$category', 'Available', '$image_name')";
+    $sql = "UPDATE Menu SET
+            menu_name='$name',
+            qty=$qty,
+            category='$category',
+            status='$status',
+            image=" . ($image_name ? "'$image_name'" : "NULL") . "
+            WHERE menu_id=$id";
 
     mysqli_query($conn, $sql);
 
     header("Location: dashboard.php");
-    exit;
-
-    // 2. EDIT/UPDATE MENU
-    case 'update_menu':
-        $id   = intval($_POST['id']);
-        $name = mysqli_real_escape_string($conn, $_POST['menu_name']);
-        $qty  = intval($_POST['qty']);
-        $category = mysqli_real_escape_string($conn, $_POST['category']);
-        $status = mysqli_real_escape_string($conn, $_POST['status']);
-        
-        $sql = "UPDATE Menu SET menu_name='$name', qty=$qty, category='$category', status='$status' WHERE menu_id=$id";
-        mysqli_query($conn, $sql);
-        header("Location: dashboard.php");
-        break;
+    break;
 
     // 3. HAPUS MENU
     case 'delete_menu':

@@ -52,16 +52,30 @@ $result = mysqli_query($conn, $query);
                     <div class="menu-item bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition duration-300 flex flex-col justify-between border border-gray-100 p-5 <?= !$is_available ? 'opacity-50 bg-gray-50' : ''; ?>" 
                          data-category="<?= $row['category']; ?>">
                         
-                        <div class="w-full h-44 rounded-2xl flex items-center justify-center font-bold mb-4 text-3xl <?= $is_available ? 'bg-amber-50 text-amber-500' : 'bg-gray-200 text-gray-400 grayscale'; ?>">
-                            <?php 
-                                if($row['category'] == 'Drinks') echo '🍹';
-                                elseif($row['category'] == 'Snacks') echo '🍿';
-                                else echo '🍦';
-                            ?>
-                        </div>
+                        <div class="w-full h-44 rounded-2xl overflow-hidden mb-4">
+
+    <?php if(!empty($row['image'])): ?>
+
+        <img src="uploads/<?= htmlspecialchars($row['image']); ?>"
+             alt="<?= htmlspecialchars($row['menu_name']); ?>"
+             class="w-full h-full object-cover">
+
+    <?php else: ?>
+
+        <div class="w-full h-full flex items-center justify-center font-bold text-3xl <?= $is_available ? 'bg-amber-50 text-amber-500' : 'bg-gray-200 text-gray-400 grayscale'; ?>">
+            <?php
+                if($row['category'] == 'Drinks') echo '🍹';
+                elseif($row['category'] == 'Snacks') echo '🍿';
+                else echo '🍦';
+            ?>
+        </div>
+
+    <?php endif; ?>
+
+</div>
                         
                         <div class="mb-4">
-                            <h3 class="text-lg font-bold <?= $is_available ? 'text-gray-800' : 'text-gray-400 line-through'; ?> mb-1">
+                            <h3 class="text-lg font-bold <?= $is_available ? 'text-gray-800' : 'text-gray-400'; ?> mb-1">
                                 <?= htmlspecialchars($row['menu_name']); ?>
                             </h3>
                             
