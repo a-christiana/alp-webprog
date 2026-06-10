@@ -103,7 +103,7 @@ $result = mysqli_query($conn, $query);
             </div>
 
             <form action="controller.php" method="POST" class="space-y-4">
-                <input type="hidden" name="action" value="create_transaction">
+                <input type="hidden" name="action" value="add_to_cart">
                 <input type="hidden" name="menu_id" id="modalMenuId">
 
                 <div>
@@ -148,7 +148,7 @@ $result = mysqli_query($conn, $query);
                         <span class="text-xl font-black text-gray-900">Rp <span id="modalTotalPrice">0</span></span>
                     </div>
                     <button type="submit" class="px-8 py-3 bg-[#FBE49D] hover:bg-yellow-400 text-black font-black text-sm rounded-2xl transition transform active:scale-95 shadow-md shadow-yellow-100">
-                        KONFIRMASI ORDER
+                        TAMBAH KE CART
                     </button>
                 </div>
             </form>
@@ -260,5 +260,10 @@ $result = mysqli_query($conn, $query);
     </div>
 </div>
 <?php } ?>
+
+<a href="controller.php?action=checkout"
+   class="fixed bottom-6 right-6 bg-yellow-400 px-6 py-4 rounded-full font-black shadow-xl">
+    Checkout Cart
+</a>
 </body>
 </html>
