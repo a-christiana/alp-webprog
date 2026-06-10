@@ -31,10 +31,10 @@ $total = 0;
         <?php foreach ($_SESSION['cart'] as $menu_id => $qty): ?>
             <?php
             $menu_id = intval($menu_id);
-            $query = mysqli_query($conn, "SELECT menu_name FROM menu WHERE menu_id = $menu_id");
+            $query = mysqli_query($conn, "SELECT menu_name, price FROM menu WHERE menu_id = $menu_id");
             $menu = mysqli_fetch_assoc($query);
 
-            $price = 15000;
+            $price =  $menu['price'];;
             $subtotal = $price * $qty;
             $total += $subtotal;
             ?>
