@@ -129,6 +129,7 @@ $count_completed = mysqli_num_rows(mysqli_query($conn, "SELECT * FROM `Transacti
                     <input type="hidden" name="action" value="add_menu">
                     <input type="text" name="menu_name" placeholder="Nama Menu Baru" class="px-3 py-1.5 text-sm rounded border bg-white focus:outline-none" required>
                     <input type="number" name="qty" placeholder="Stok" class="w-20 px-3 py-1.5 text-sm rounded border bg-white focus:outline-none" required>
+                    <input type="number" name="price" placeholder="Harga (Rp)" class="w-28 px-3 py-1.5 text-sm rounded border bg-white focus:outline-none" required>
                     <select name="category" class="px-3 py-1.5 text-sm rounded border bg-white focus:outline-none" required>
                         <option value="Ice Cream">Ice Cream</option>
                         <option value="Drinks">Drinks</option>
