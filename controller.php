@@ -36,33 +36,62 @@ switch ($action) {
         break;
 
     // 4. MEMBUAT TRANSAKSI BARU (DARI STOREFRONT)
-    case 'create_transaction':
+    case 'add_to_cart':
+    session_start();
+
     $menu_id = intval($_POST['menu_id']);
     $qty = intval($_POST['qty']);
 
-    $check_menu = mysqli_query($conn, "SELECT qty FROM menu WHERE menu_id = $menu_id");
-    $menu = mysqli_fetch_assoc($check_menu);
+    if (!isset($_SESSION['cart'])) {
+        $_SESSION['cart'] = [];
+    }
 
-    if ($menu && $menu['qty'] >= $qty) {
-        mysqli_query($conn, "UPDATE menu SET qty = qty - $qty WHERE menu_id = $menu_id");
-
-        mysqli_query($conn, "INSERT INTO `transaction` (order_status) VALUES ('Incoming')");
-        $transaction_id = mysqli_insert_id($conn);
-
-        mysqli_query($conn, "INSERT INTO transaction_detail 
-        (transaction_id, menu_id, price, qty) 
-        VALUES ($transaction_id, $menu_id, 15000, $qty)");
-
-        echo "<script>
-alert('Pesanan berhasil dibuat! Nomor antrean kamu: #TRX-$transaction_id');
-window.location.href='receipt.php?id=$transaction_id';
-</script>";
+    if (isset($_SESSION['cart'][$menu_id])) {
+        $_SESSION['cart'][$menu_id] += $qty;
     } else {
+        $_SESSION['cart'][$menu_id] = $qty;
+    }
+
+    echo "<script>
+        alert('Menu berhasil ditambahkan ke cart!');
+        window.location.href='index.php';
+    </script>";
+    break;
+
+
+case 'checkout':
+    session_start();
+
+    if (!isset($_SESSION['cart']) || count($_SESSION['cart']) == 0) {
         echo "<script>
-            alert('Maaf, stok tidak cukup!');
+            alert('Cart masih kosong!');
             window.location.href='index.php';
         </script>";
+        exit;
     }
+
+    mysqli_query($conn, "INSERT INTO `transaction` (order_status) VALUES ('Incoming')");
+    $transaction_id = mysqli_insert_id($conn);
+
+    foreach ($_SESSION['cart'] as $menu_id => $qty) {
+        $menu_id = intval($menu_id);
+        $qty = intval($qty);
+
+        $check_menu = mysqli_query($conn, "SELECT qty FROM menu WHERE menu_id = $menu_id");
+        $menu = mysqli_fetch_assoc($check_menu);
+
+        if ($menu && $menu['qty'] >= $qty) {
+            mysqli_query($conn, "UPDATE menu SET qty = qty - $qty WHERE menu_id = $menu_id");
+
+            mysqli_query($conn, "INSERT INTO transaction_detail 
+            (transaction_id, menu_id, price, qty) 
+            VALUES ($transaction_id, $menu_id, 15000, $qty)");
+        }
+    }
+
+    unset($_SESSION['cart']);
+
+    header("Location: receipt.php?id=$transaction_id");
     break;
 
     // 5. UPDATE STATUS PESANAN 

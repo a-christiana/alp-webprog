@@ -17,7 +17,18 @@ $query = mysqli_query($conn, "
     WHERE t.transaction_id = $id
 ");
 
-$data = mysqli_fetch_assoc($query);
+$items = [];
+
+while ($row = mysqli_fetch_assoc($query)) {
+    $items[] = $row;
+}
+
+if (count($items) == 0) {
+    echo "Struk tidak ditemukan.";
+    exit;
+}
+
+$data = $items[0];
 
 if (!$data) {
     echo "Struk tidak ditemukan.";
@@ -45,12 +56,19 @@ $total = $data['qty'] * $data['price'];
 <p><b>Date:</b> <?= $data['created_at']; ?></p>
         </div>
 
-        <div class="py-4">
-            <div class="flex justify-between text-sm">
-                <span><?= $data['menu_name']; ?> x <?= $data['qty']; ?></span>
-                <span>Rp <?= number_format($total, 0, ',', '.'); ?></span>
-            </div>
+        <div class="py-4 space-y-2">
+    <?php
+    $total = 0;
+    foreach ($items as $item) {
+        $subtotal = $item['qty'] * $item['price'];
+        $total += $subtotal;
+    ?>
+        <div class="flex justify-between text-sm">
+            <span><?= $item['menu_name']; ?> x <?= $item['qty']; ?></span>
+            <span>Rp <?= number_format($subtotal, 0, ',', '.'); ?></span>
         </div>
+    <?php } ?>
+</div>
 
         <div class="border-t pt-4 flex justify-between font-black text-lg">
             <span>Total</span>
