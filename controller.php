@@ -37,23 +37,33 @@ switch ($action) {
 
     // 4. MEMBUAT TRANSAKSI BARU (DARI STOREFRONT)
     case 'create_transaction':
-        $menu_id = intval($_POST['menu_id']);
-        
-        // Cek stok menu dulu
-        $check_menu = mysqli_query($conn, "SELECT qty FROM Menu WHERE menu_id = $menu_id");
-        $menu = mysqli_fetch_assoc($check_menu);
-        
-        if ($menu && $menu['qty'] > 0) {
-            mysqli_query($conn, "UPDATE Menu SET qty = qty - $ WHERE menu_id = $menu_id");
-            mysqli_query($conn, "INSERT INTO `Transaction` (order_status) VALUES ('Incoming')");
-            $transaction_id = mysqli_insert_id($conn);
-            mysqli_query($conn, "INSERT INTO Transaction_Detail (transaction_id, menu_id, price, qty) VALUES ($transaction_id, $menu_id, 15000, 1)");
-            
-            echo "<script>alert('Pesanan Berhasil Dibuat!'); window.location.href='receipt.php?id=$transaction_id';</script>";
-        } else {
-            echo "<script>alert('Maaf, Stok Habis!'); window.location.href='index.php';</script>";
-        }
-        break;
+    $menu_id = intval($_POST['menu_id']);
+    $qty = intval($_POST['qty']);
+
+    $check_menu = mysqli_query($conn, "SELECT qty FROM menu WHERE menu_id = $menu_id");
+    $menu = mysqli_fetch_assoc($check_menu);
+
+    if ($menu && $menu['qty'] >= $qty) {
+        mysqli_query($conn, "UPDATE menu SET qty = qty - $qty WHERE menu_id = $menu_id");
+
+        mysqli_query($conn, "INSERT INTO `transaction` (order_status) VALUES ('Incoming')");
+        $transaction_id = mysqli_insert_id($conn);
+
+        mysqli_query($conn, "INSERT INTO transaction_detail 
+        (transaction_id, menu_id, price, qty) 
+        VALUES ($transaction_id, $menu_id, 15000, $qty)");
+
+        echo "<script>
+alert('Pesanan berhasil dibuat! Nomor antrean kamu: #TRX-$transaction_id');
+window.location.href='receipt.php?id=$transaction_id';
+</script>";
+    } else {
+        echo "<script>
+            alert('Maaf, stok tidak cukup!');
+            window.location.href='index.php';
+        </script>";
+    }
+    break;
 
     // 5. UPDATE STATUS PESANAN 
     case 'update_status':
