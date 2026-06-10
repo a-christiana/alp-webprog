@@ -19,7 +19,7 @@ $result = mysqli_query($conn, $query);
     <nav class="bg-white sticky top-0 shadow-sm px-8 py-6 flex items-center justify-between z-50 border-b border-gray-100">
         <div class="text-2xl font-bold tracking-widest text-gray-800">LUCIOLE</div>
         <div class="flex items-center space-x-6">
-
+        
     <?php if(isset($_SESSION['last_transaction_id'])) { ?>
         <a href="receipt.php?id=<?= $_SESSION['last_transaction_id']; ?>" 
            class="text-sm font-semibold text-gray-600 hover:text-black transition">
@@ -128,7 +128,7 @@ $result = mysqli_query($conn, $query);
             </div>
 
             <form action="controller.php" method="POST" class="space-y-4">
-                <input type="hidden" name="action" value="create_transaction">
+                <input type="hidden" name="action" value="add_to_cart">
                 <input type="hidden" name="menu_id" id="modalMenuId">
 
                 <div>

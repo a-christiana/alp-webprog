@@ -38,12 +38,12 @@ switch ($action) {
     header("Location: dashboard.php");
     exit;
 
-    // 2. EDIT/UPDATE MENU
-    case 'update_menu':
+   case 'update_menu':
 
     $id   = intval($_POST['id']);
     $name = mysqli_real_escape_string($conn, $_POST['menu_name']);
     $qty  = intval($_POST['qty']);
+    $price = intval($_POST['price']);
     $category = mysqli_real_escape_string($conn, $_POST['category']);
     $status = mysqli_real_escape_string($conn, $_POST['status']);
 
@@ -72,39 +72,20 @@ switch ($action) {
         );
     }
 
-    $sql = "INSERT INTO Menu
-            (menu_name, qty, price, category, status, image)
-            VALUES
-            ('$name', $qty, $price '$category', 'Available', '$image_name')";
-            
     $sql = "UPDATE Menu SET
             menu_name='$name',
             qty=$qty,
+            price=$price,
             category='$category',
             status='$status',
             image=" . ($image_name ? "'$image_name'" : "NULL") . "
             WHERE menu_id=$id";
-    
+
     mysqli_query($conn, $sql);
 
     header("Location: dashboard.php");
     break;
-    exit;
-
-    // 2. EDIT/UPDATE MENU
-    case 'update_menu':
-        $id   = intval($_POST['id']);
-        $name = mysqli_real_escape_string($conn, $_POST['menu_name']);
-        $qty  = intval($_POST['qty']);
-        $price = intval($_POST['price']);
-        $category = mysqli_real_escape_string($conn, $_POST['category']);
-        $status = mysqli_real_escape_string($conn, $_POST['status']);
-        
-        $sql = "UPDATE Menu SET menu_name='$name', qty=$qty, price=$price, category='$category', status='$status' WHERE menu_id=$id";
-        mysqli_query($conn, $sql);
-        header("Location: dashboard.php");
-        break;
-
+    
     // 3. HAPUS MENU
     case 'delete_menu':
         $id = intval($_GET['id']);
