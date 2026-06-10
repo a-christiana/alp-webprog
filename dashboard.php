@@ -125,11 +125,12 @@ $count_completed = mysqli_num_rows(mysqli_query($conn, "SELECT * FROM `Transacti
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <h2 class="text-lg font-extrabold text-gray-800">🍦 Master Kelola Menu Toko</h2>
                 
-                <form action="controller.php" method="POST" class="flex flex-wrap gap-2 items-center bg-gray-50 p-3 rounded-lg border w-full md:w-auto">
+                <form action="controller.php" method="POST" enctype="multipart/form-data" class="flex flex-wrap gap-2 items-center bg-gray-50 p-3 rounded-lg border w-full md:w-auto">
                     <input type="hidden" name="action" value="add_menu">
                     <input type="text" name="menu_name" placeholder="Nama Menu Baru" class="px-3 py-1.5 text-sm rounded border bg-white focus:outline-none" required>
                     <input type="number" name="qty" placeholder="Stok" class="w-20 px-3 py-1.5 text-sm rounded border bg-white focus:outline-none" required>
                     <input type="number" name="price" placeholder="Harga (Rp)" class="w-28 px-3 py-1.5 text-sm rounded border bg-white focus:outline-none" required>
+                    <input type="file" name="image" accept="image/*">
                     <select name="category" class="px-3 py-1.5 text-sm rounded border bg-white focus:outline-none" required>
                         <option value="Ice Cream">Ice Cream</option>
                         <option value="Drinks">Drinks</option>
