@@ -73,6 +73,8 @@ case 'checkout':
     mysqli_query($conn, "INSERT INTO `transaction` (order_status) VALUES ('Incoming')");
     $transaction_id = mysqli_insert_id($conn);
 
+    $_SESSION['last_transaction_id'] = $transaction_id;
+
     foreach ($_SESSION['cart'] as $menu_id => $qty) {
         $menu_id = intval($menu_id);
         $qty = intval($qty);
