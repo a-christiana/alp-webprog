@@ -44,12 +44,12 @@ switch ($action) {
         $menu = mysqli_fetch_assoc($check_menu);
         
         if ($menu && $menu['qty'] > 0) {
-            mysqli_query($conn, "UPDATE Menu SET qty = qty - 1 WHERE menu_id = $menu_id");
+            mysqli_query($conn, "UPDATE Menu SET qty = qty - $ WHERE menu_id = $menu_id");
             mysqli_query($conn, "INSERT INTO `Transaction` (order_status) VALUES ('Incoming')");
             $transaction_id = mysqli_insert_id($conn);
             mysqli_query($conn, "INSERT INTO Transaction_Detail (transaction_id, menu_id, price, qty) VALUES ($transaction_id, $menu_id, 15000, 1)");
             
-            echo "<script>alert('Pesanan Berhasil Dibuat! Silakan pantau di Admin Dashboard.'); window.location.href='index.php';</script>";
+            echo "<script>alert('Pesanan Berhasil Dibuat!'); window.location.href='receipt.php?id=$transaction_id';</script>";
         } else {
             echo "<script>alert('Maaf, Stok Habis!'); window.location.href='index.php';</script>";
         }

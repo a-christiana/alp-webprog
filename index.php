@@ -239,5 +239,26 @@ $result = mysqli_query($conn, $query);
         clickedButton.classList.add('bg-[#FBE49D]', 'text-black', 'shadow-sm');
     }
     </script>
+
+    <?php if (isset($_GET['success']) && isset($_GET['id'])) { ?>
+<div class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+    <div class="bg-white w-[380px] p-6 rounded-3xl shadow-xl text-center">
+        <p class="text-sm text-gray-400">Pesanan Berhasil</p>
+
+        <h1 class="text-4xl font-black text-yellow-500 my-3">
+            #TRX-<?= $_GET['id']; ?>
+        </h1>
+
+        <p class="text-gray-600 text-sm mb-6">
+            Simpan nomor antrean ini untuk melihat status pesanan kamu.
+        </p>
+
+        <a href="index.php" 
+           class="block w-full bg-yellow-400 py-3 rounded-2xl font-bold">
+            Oke
+        </a>
+    </div>
+</div>
+<?php } ?>
 </body>
 </html>
