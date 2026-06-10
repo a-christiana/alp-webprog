@@ -35,8 +35,8 @@ $count_completed = mysqli_num_rows(mysqli_query($conn, "SELECT * FROM `Transacti
 </head>
 <body class="bg-gray-100 font-sans min-h-screen flex flex-col">
 
-    <header class="bg-[#FBE49D] px-8 py-4 flex items-center justify-between shadow-sm">
-        <div class="flex items-center space-x-12">
+    <header class="bg-[#FBE49D] px-4 sm:px-8 py-4 flex flex-col sm:flex-row gap-4 items-center justify-between shadow-sm">
+        <div class="flex flex-col sm:flex-row items-center gap-3 sm:space-x-12 text-center sm:text-left">
             <h1 class="text-xl font-bold tracking-widest text-gray-800">LUCIOLE ADMIN</h1>
             <nav class="space-x-6 text-sm font-medium text-gray-700">
                 <a href="index.php" class="hover:text-black">Storefront</a>

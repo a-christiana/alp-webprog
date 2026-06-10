@@ -18,7 +18,7 @@ $total = 0;
 </head>
 <body class="bg-gray-100 min-h-screen flex justify-center items-center">
 
-<div class="bg-white p-6 rounded-3xl shadow-lg w-[500px]">
+<div class="bg-white p-6 rounded-3xl shadow-lg w-full max-w-md mx-4">
 
     <h1 class="text-2xl font-black mb-4">
         Checkout Cart

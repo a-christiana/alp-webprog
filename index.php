@@ -33,7 +33,7 @@ $result = mysqli_query($conn, $query);
     </nav>
 
     <section class="p-8 max-w-7xl mx-auto">
-        <div class="flex gap-x-4 mb-10 overflow-x-auto pb-2 scrollbar-none">
+        <div class="flex gap-3 my-6 overflow-x-auto pb-2 px-4 scrollbar-none whitespace-nowrap">
             <button onclick="filterCategory('ALL')" class="category-btn px-10 py-2.5 rounded-full bg-[#FBE49D] text-black font-semibold shadow-sm text-sm transition-all duration-200">ALL</button>
             <button onclick="filterCategory('Ice Cream')" class="category-btn px-10 py-2.5 rounded-full bg-white border text-gray-600 font-semibold text-sm hover:bg-gray-50 transition-all duration-200">Ice Cream</button>
             <button onclick="filterCategory('Drinks')" class="category-btn px-10 py-2.5 rounded-full bg-white border text-gray-600 font-semibold text-sm hover:bg-gray-50 transition-all duration-200">Drinks</button>
