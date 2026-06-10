@@ -10,7 +10,7 @@ switch ($action) {
     $name = mysqli_real_escape_string($conn, $_POST['menu_name']);
     $qty = intval($_POST['qty']);
     $category = mysqli_real_escape_string($conn, $_POST['category']);
-
+    $price = intval($_POST['price']);
     $image_name = null;
 
     if(isset($_FILES['image']) && $_FILES['image']['error'] == 0){
@@ -25,9 +25,9 @@ switch ($action) {
     }
 
     $sql = "INSERT INTO Menu
-            (menu_name, qty, category, status, image)
+            (menu_name, qty, price, category, status, image)
             VALUES
-            ('$name', $qty, '$category', 'Available', '$image_name')";
+            ('$name', $qty, $price '$category', 'Available', '$image_name')";
 
     mysqli_query($conn, $sql);
 
@@ -39,10 +39,11 @@ switch ($action) {
         $id   = intval($_POST['id']);
         $name = mysqli_real_escape_string($conn, $_POST['menu_name']);
         $qty  = intval($_POST['qty']);
+        $price = intval($_POST['price']);
         $category = mysqli_real_escape_string($conn, $_POST['category']);
         $status = mysqli_real_escape_string($conn, $_POST['status']);
         
-        $sql = "UPDATE Menu SET menu_name='$name', qty=$qty, category='$category', status='$status' WHERE menu_id=$id";
+        $sql = "UPDATE Menu SET menu_name='$name', qty=$qty, price=$price, category='$category', status='$status' WHERE menu_id=$id";
         mysqli_query($conn, $sql);
         header("Location: dashboard.php");
         break;
@@ -99,12 +100,20 @@ case 'checkout':
         $check_menu = mysqli_query($conn, "SELECT qty FROM menu WHERE menu_id = $menu_id");
         $menu = mysqli_fetch_assoc($check_menu);
 
+        
         if ($menu && $menu['qty'] >= $qty) {
             mysqli_query($conn, "UPDATE menu SET qty = qty - $qty WHERE menu_id = $menu_id");
 
+            $get_price = mysqli_query($conn,
+            "SELECT price FROM menu WHERE menu_id = $menu_id");
+
+            $data_price = mysqli_fetch_assoc($get_price);
+
+            $price = $data_price['price'];
+
             mysqli_query($conn, "INSERT INTO transaction_detail 
             (transaction_id, menu_id, price, qty) 
-            VALUES ($transaction_id, $menu_id, 15000, $qty)");
+            VALUES ($transaction_id, $menu_id, $price, $qty)");
         }
     }
 
